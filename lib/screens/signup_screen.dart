@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:instagram/constants.dart';
+import 'package:instagram/screens/main_screen.dart';
 import 'package:instagram/screens/signin_screen.dart';
+import 'package:instagram/services/auth_service.dart';
+import 'package:instagram/utils/show_snackbar.dart';
 import 'package:instagram/widgets/custom_button.dart';
 import 'package:instagram/widgets/custom_textfield.dart';
 
@@ -20,6 +23,30 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+
+  bool _isLoading = false;
+
+  void register() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    String res = await AuthService().signUp(
+      username: _usernameController.text.toLowerCase(),
+      email: _emailController.text,
+      password: _passwordController.text,
+    );
+
+    if (res == 'Success') {
+      Navigator.of(context).pushReplacement(MainScreen.route());
+    } else {
+      showSnackbar(context, res);
+    }
+
+    setState(() {
+      _isLoading = false;
+    });
+  }
 
   @override
   void dispose() {
@@ -64,8 +91,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   height: 40,
                   label: 'Sign Up',
                   color: accentBlue,
-                  isLoading: false,
-                  onTap: () {},
+                  isLoading: _isLoading,
+                  onTap: register,
                 ),
                 const Spacer(),
                 Row(

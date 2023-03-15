@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:instagram/constants.dart';
+import 'package:instagram/screens/main_screen.dart';
 import 'package:instagram/screens/signup_screen.dart';
+import 'package:instagram/services/auth_service.dart';
+import 'package:instagram/utils/show_snackbar.dart';
 import 'package:instagram/widgets/custom_button.dart';
 import 'package:instagram/widgets/custom_textfield.dart';
 
@@ -19,6 +22,29 @@ class SignInScreen extends StatefulWidget {
 class _SignInScreenState extends State<SignInScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+
+  bool _isLoading = false;
+
+  void login() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    String res = await AuthService().signIn(
+      email: _emailController.text,
+      password: _passwordController.text,
+    );
+
+    if (res == 'Success') {
+      Navigator.of(context).pushReplacement(MainScreen.route());
+    } else {
+      showSnackbar(context, res);
+    }
+
+    setState(() {
+      _isLoading = false;
+    });
+  }
 
   @override
   void dispose() {
@@ -58,8 +84,8 @@ class _SignInScreenState extends State<SignInScreen> {
                   height: 40,
                   label: 'Sign In',
                   color: accentBlue,
-                  isLoading: false,
-                  onTap: () {},
+                  isLoading: _isLoading,
+                  onTap: login,
                 ),
                 const Spacer(),
                 Row(
