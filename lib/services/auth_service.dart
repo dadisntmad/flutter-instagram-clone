@@ -3,6 +3,12 @@ import 'package:instagram/constants.dart';
 import 'package:instagram/models/user_model.dart';
 
 class AuthService {
+  // get current user
+  Future<UserModel> getCurrentUser() async {
+    final user = await db.collection('users').doc(auth.currentUser?.uid).get();
+    return UserModel.fromSnap(user);
+  }
+
   // check if username already exists
   Future<bool> isUsernameAlreadyExists(String username) async {
     final result = await db
