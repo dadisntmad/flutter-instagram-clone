@@ -84,6 +84,7 @@ class _SignInScreenState extends State<SignInScreen> {
                   height: 40,
                   label: 'Sign In',
                   color: accentBlue,
+                  textColor: Colors.white,
                   isLoading: _isLoading,
                   onTap: login,
                 ),

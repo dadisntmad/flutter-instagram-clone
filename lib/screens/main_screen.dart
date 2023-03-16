@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:instagram/providers/user_provider.dart';
 import 'package:instagram/screens/new_post_screen.dart';
+import 'package:instagram/screens/profile_screen.dart';
 import 'package:provider/provider.dart';
 
 class MainScreen extends StatefulWidget {
@@ -42,7 +43,7 @@ class _MainScreenState extends State<MainScreen> {
           Text('Search'),
           NewPostScreen(),
           Text('Notifications'),
-          Text('Profile'),
+          ProfileScreen(),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(

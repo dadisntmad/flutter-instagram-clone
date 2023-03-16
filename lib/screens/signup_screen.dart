@@ -91,6 +91,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   height: 40,
                   label: 'Sign Up',
                   color: accentBlue,
+                  textColor: Colors.white,
                   isLoading: _isLoading,
                   onTap: register,
                 ),

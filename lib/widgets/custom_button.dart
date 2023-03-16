@@ -5,6 +5,7 @@ class CustomButton extends StatelessWidget {
   final double height;
   final String label;
   final Color color;
+  final Color textColor;
   final bool isLoading;
   final VoidCallback onTap;
 
@@ -14,6 +15,7 @@ class CustomButton extends StatelessWidget {
     required this.height,
     required this.label,
     required this.color,
+    required this.textColor,
     required this.isLoading,
     required this.onTap,
   }) : super(key: key);
@@ -41,8 +43,8 @@ class CustomButton extends StatelessWidget {
                 )
               : Text(
                   label,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: textColor,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
