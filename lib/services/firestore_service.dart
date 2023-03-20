@@ -41,4 +41,13 @@ class FirestoreService {
     }
     return res;
   }
+
+  // delete a post
+  Future<void> deletePost(String postId) async {
+    try {
+      await db.collection('posts').doc(postId).delete();
+    } catch (e) {
+      print(e.toString());
+    }
+  }
 }

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:instagram/services/firestore_service.dart';
 import 'package:instagram/widgets/profile_image.dart';
 import 'package:intl/intl.dart';
 
@@ -37,7 +38,36 @@ class PostCard extends StatelessWidget {
                   ),
                 ],
               ),
-              IconButton(onPressed: () {}, icon: const Icon(Icons.more_horiz)),
+              IconButton(
+                  onPressed: () {
+                    showDialog(
+                      barrierDismissible: false,
+                      context: context,
+                      builder: (BuildContext context) => AlertDialog(
+                        title: const Text('Confirmation'),
+                        content: const Text(
+                          'Are you sure you want to delete post?',
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context, 'Cancel'),
+                            child: const Text('Cancel'),
+                          ),
+                          TextButton(
+                            onPressed: () async {
+                              Navigator.pop(context, 'OK');
+                              Navigator.of(context).pop();
+                              await FirestoreService().deletePost(
+                                snap['postId'],
+                              );
+                            },
+                            child: const Text('OK'),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.more_horiz)),
             ],
           ),
         ),
