@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram/constants.dart';
+import 'package:instagram/screens/post_detailed_screen.dart';
 import 'package:instagram/widgets/custom_button.dart';
 import 'package:instagram/widgets/profile_image.dart';
 
@@ -130,7 +131,15 @@ class ProfileScreen extends StatelessWidget {
                       (BuildContext context, int index) {
                         final post = postSnapshot.data!.docs[index];
                         return GestureDetector(
-                          onTap: () {},
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => PostDetailedScreen(
+                                  snap: post,
+                                ),
+                              ),
+                            );
+                          },
                           child: Image.network(
                             post['postUrl'],
                             fit: BoxFit.cover,
