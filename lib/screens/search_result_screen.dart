@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram/constants.dart';
+import 'package:instagram/screens/profile_screen.dart';
 import 'package:instagram/widgets/profile_image.dart';
 
 class SearchResultScreen extends StatelessWidget {
@@ -42,7 +43,13 @@ class SearchResultScreen extends StatelessWidget {
                     children: [
                       GestureDetector(
                         onTap: () {
-                          print('Navigating to: ${user['username']}');
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => ProfileScreen(
+                                uid: user['uid'],
+                              ),
+                            ),
+                          );
                         },
                         child: Row(
                           children: [

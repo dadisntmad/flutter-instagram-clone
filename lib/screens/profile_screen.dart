@@ -6,25 +6,40 @@ import 'package:instagram/widgets/custom_button.dart';
 import 'package:instagram/widgets/profile_image.dart';
 
 class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({Key? key}) : super(key: key);
+  final String uid;
+
+  const ProfileScreen({
+    Key? key,
+    required this.uid,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-      stream: db.collection('users').doc(auth.currentUser!.uid).snapshots(),
+      stream: db.collection('users').doc(uid).snapshots(),
       builder: (BuildContext context, AsyncSnapshot userSnapshot) {
         return StreamBuilder(
-          stream: db
-              .collection('posts')
-              .where('uid', isEqualTo: auth.currentUser!.uid)
-              .snapshots(),
+          stream:
+              db.collection('posts').where('uid', isEqualTo: uid).snapshots(),
           builder: (BuildContext context,
               AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> postSnapshot) {
-            final user = userSnapshot.data!;
+            final user = userSnapshot.data;
+
+            if (postSnapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: CircularProgressIndicator(
+                  color: Colors.black,
+                ),
+              );
+            }
+
             return Scaffold(
               appBar: AppBar(
                 elevation: 0,
                 backgroundColor: Colors.white,
+                leading: auth.currentUser?.uid == uid
+                    ? null
+                    : const BackButton(color: Colors.black),
                 title: Text(
                   '${user['username']}',
                   style: const TextStyle(

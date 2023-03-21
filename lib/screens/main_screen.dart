@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:instagram/constants.dart';
 import 'package:instagram/providers/user_provider.dart';
 import 'package:instagram/screens/new_post_screen.dart';
 import 'package:instagram/screens/profile_screen.dart';
@@ -39,12 +40,12 @@ class _MainScreenState extends State<MainScreen> {
     return Scaffold(
       body: IndexedStack(
         index: _currentIndex,
-        children: const [
-          Text('Home'),
-          SearchScreen(),
-          NewPostScreen(),
-          Text('Notifications'),
-          ProfileScreen(),
+        children: [
+          const Text('Home'),
+          const SearchScreen(),
+          const NewPostScreen(),
+          const Text('Notifications'),
+          ProfileScreen(uid: auth.currentUser!.uid),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
