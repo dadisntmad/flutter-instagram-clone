@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram/constants.dart';
 import 'package:instagram/screens/post_detailed_screen.dart';
+import 'package:instagram/screens/signin_screen.dart';
+import 'package:instagram/services/auth_service.dart';
 import 'package:instagram/widgets/custom_button.dart';
 import 'package:instagram/widgets/profile_image.dart';
 
@@ -105,31 +107,49 @@ class ProfileScreen extends StatelessWidget {
                             ),
                           const SizedBox(height: 14),
                           Row(
-                            children: [
-                              Expanded(
-                                child: CustomButton(
-                                  width: 100,
-                                  height: 30,
-                                  label: 'Edit Profile',
-                                  color: accentGrey,
-                                  textColor: Colors.black,
-                                  isLoading: false,
-                                  onTap: () {},
-                                ),
-                              ),
-                              const SizedBox(width: 4),
-                              Expanded(
-                                child: CustomButton(
-                                  width: 100,
-                                  height: 30,
-                                  label: 'Sign Out',
-                                  color: accentGrey,
-                                  textColor: Colors.black,
-                                  isLoading: false,
-                                  onTap: () {},
-                                ),
-                              ),
-                            ],
+                            children: auth.currentUser?.uid == uid
+                                ? [
+                                    Expanded(
+                                      child: CustomButton(
+                                        width: 100,
+                                        height: 30,
+                                        label: 'Edit Profile',
+                                        color: accentGrey,
+                                        textColor: Colors.black,
+                                        isLoading: false,
+                                        onTap: () {},
+                                      ),
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Expanded(
+                                      child: CustomButton(
+                                        width: 100,
+                                        height: 30,
+                                        label: 'Sign Out',
+                                        color: accentGrey,
+                                        textColor: Colors.black,
+                                        isLoading: false,
+                                        onTap: () async {
+                                          Navigator.pushReplacement(
+                                              context, SignInScreen.route());
+                                          await AuthService().signOut();
+                                        },
+                                      ),
+                                    ),
+                                  ]
+                                : [
+                                    Expanded(
+                                      child: CustomButton(
+                                        width: double.infinity,
+                                        height: 30,
+                                        label: 'Follow',
+                                        color: accentBlue,
+                                        textColor: Colors.white,
+                                        isLoading: false,
+                                        onTap: () {},
+                                      ),
+                                    ),
+                                  ],
                           ),
                         ],
                       ),
@@ -145,6 +165,7 @@ class ProfileScreen extends StatelessWidget {
                     delegate: SliverChildBuilderDelegate(
                       (BuildContext context, int index) {
                         final post = postSnapshot.data!.docs[index];
+
                         return GestureDetector(
                           onTap: () {
                             Navigator.of(context).push(

@@ -34,6 +34,10 @@ class SearchResultScreen extends StatelessWidget {
             itemBuilder: (BuildContext context, int index) {
               final user = snapshot.data!.docs[index];
 
+              if (searchText.isEmpty) {
+                return const SizedBox.shrink();
+              }
+
               if (user['username']
                   .toString()
                   .startsWith(searchText.toLowerCase())) {

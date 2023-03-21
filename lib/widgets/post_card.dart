@@ -1,170 +1,207 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:instagram/constants.dart';
+import 'package:instagram/models/user_model.dart';
+import 'package:instagram/providers/user_provider.dart';
 import 'package:instagram/services/firestore_service.dart';
 import 'package:instagram/widgets/profile_image.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class PostCard extends StatelessWidget {
-  final QueryDocumentSnapshot<Map<String, dynamic>> snap;
+  final String postId;
 
   const PostCard({
     Key? key,
-    required this.snap,
+    required this.postId,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final postedAt = DateFormat('d MMMM y').format(
-      snap['datePublished'].toDate(),
-    );
+    final UserModel? user = context.watch<UserProvider>().user;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
+    return StreamBuilder(
+      stream: db.collection('posts').doc(postId).snapshots(),
+      builder: (BuildContext context, AsyncSnapshot postSnap) {
+        final snapshot = postSnap.data;
+
+        if (postSnap.connectionState == ConnectionState.waiting) {
+          return const Center(
+            child: CircularProgressIndicator(
+              color: Colors.black,
+            ),
+          );
+        }
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  ProfileImage(imageUrl: snap['profileImage'], size: 30),
-                  const SizedBox(width: 10),
-                  Text(
-                    snap['username'],
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w500,
-                    ),
+                  Row(
+                    children: [
+                      ProfileImage(
+                          imageUrl: snapshot['profileImage'], size: 30),
+                      const SizedBox(width: 10),
+                      Text(
+                        snapshot['username'],
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
                   ),
+                  if (user?.uid == snapshot['uid'])
+                    IconButton(
+                        onPressed: () {
+                          showDialog(
+                            barrierDismissible: false,
+                            context: context,
+                            builder: (BuildContext context) => AlertDialog(
+                              title: const Text('Confirmation'),
+                              content: const Text(
+                                'Are you sure you want to delete post?',
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () =>
+                                      Navigator.pop(context, 'Cancel'),
+                                  child: const Text('Cancel'),
+                                ),
+                                TextButton(
+                                  onPressed: () async {
+                                    Navigator.pop(context, 'OK');
+                                    Navigator.of(context).pop();
+                                    await FirestoreService().deletePost(
+                                      snapshot['postId'],
+                                    );
+                                  },
+                                  child: const Text('OK'),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.more_horiz)),
                 ],
               ),
-              IconButton(
-                  onPressed: () {
-                    showDialog(
-                      barrierDismissible: false,
-                      context: context,
-                      builder: (BuildContext context) => AlertDialog(
-                        title: const Text('Confirmation'),
-                        content: const Text(
-                          'Are you sure you want to delete post?',
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(context, 'Cancel'),
-                            child: const Text('Cancel'),
-                          ),
-                          TextButton(
-                            onPressed: () async {
-                              Navigator.pop(context, 'OK');
-                              Navigator.of(context).pop();
-                              await FirestoreService().deletePost(
-                                snap['postId'],
-                              );
-                            },
-                            child: const Text('OK'),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                  icon: const Icon(Icons.more_horiz)),
-            ],
-          ),
-        ),
-        GestureDetector(
-          onDoubleTap: () {},
-          child: Image.network(
-            snap['postUrl'],
-            width: double.infinity,
-            height: 500,
-            fit: BoxFit.cover,
-          ),
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
+            ),
+            GestureDetector(
+              onDoubleTap: () async {
+                await FirestoreService().likePost(
+                  snapshot['postId'],
+                  user!.uid,
+                  snapshot['likes'],
+                );
+              },
+              child: Image.network(
+                snapshot['postUrl'],
+                width: double.infinity,
+                height: 500,
+                fit: BoxFit.cover,
+              ),
+            ),
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                IconButton(
-                  onPressed: () {},
-                  icon: const Icon(
-                    Icons.favorite_border,
-                  ),
-                ),
-                IconButton(
-                  onPressed: () {},
-                  icon: Image.asset(
-                    'assets/comment.png',
-                    width: 24,
-                    height: 24,
-                  ),
-                ),
-                IconButton(
-                  onPressed: () {},
-                  icon: Image.asset(
-                    'assets/send.png',
-                    width: 26,
-                    height: 26,
-                  ),
-                ),
-              ],
-            ),
-            IconButton(
-              onPressed: () {},
-              icon: const Icon(
-                Icons.bookmark_border,
-              ),
-            ),
-          ],
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 14.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                '${snap['likes'].length} likes',
-                style: const TextStyle(
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              const SizedBox(height: 4),
-              if (snap['description'] != '')
                 Row(
                   children: [
-                    Text(
-                      '${snap['username']} ',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w500,
+                    IconButton(
+                      onPressed: () async {
+                        await FirestoreService().likePost(
+                          snapshot['postId'],
+                          user!.uid,
+                          snapshot['likes'],
+                        );
+                      },
+                      icon: snapshot['likes'].contains(user?.uid)
+                          ? const Icon(
+                              Icons.favorite,
+                              color: Colors.red,
+                            )
+                          : const Icon(
+                              Icons.favorite_border,
+                            ),
+                    ),
+                    IconButton(
+                      onPressed: () {},
+                      icon: Image.asset(
+                        'assets/comment.png',
+                        width: 24,
+                        height: 24,
                       ),
                     ),
-                    Expanded(
-                      child: Text(
-                        snap['description'],
-                        overflow: TextOverflow.ellipsis,
+                    IconButton(
+                      onPressed: () {},
+                      icon: Image.asset(
+                        'assets/send.png',
+                        width: 26,
+                        height: 26,
                       ),
                     ),
                   ],
                 ),
-              const SizedBox(height: 4),
-              const Text(
-                'View all 3 comments',
-                style: TextStyle(
-                  color: Colors.grey,
+                IconButton(
+                  onPressed: () {},
+                  icon: const Icon(
+                    Icons.bookmark_border,
+                  ),
                 ),
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 14.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${snapshot['likes'].length} ${snapshot['likes'].length == 1 ? 'like' : 'likes'}',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  if (snapshot['description'] != '')
+                    Row(
+                      children: [
+                        Text(
+                          '${snapshot['username']} ',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        Expanded(
+                          child: Text(
+                            snapshot['description'],
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  const SizedBox(height: 4),
+                  const Text(
+                    'View all 3 comments',
+                    style: TextStyle(
+                      color: Colors.grey,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    DateFormat('d MMMM y')
+                        .format(snapshot['datePublished'].toDate()),
+                    style: const TextStyle(
+                      color: Colors.grey,
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                ],
               ),
-              const SizedBox(height: 4),
-              Text(
-                postedAt,
-                style: const TextStyle(
-                  color: Colors.grey,
-                ),
-              ),
-              const SizedBox(height: 14),
-            ],
-          ),
-        ),
-      ],
+            ),
+          ],
+        );
+      },
     );
   }
 }

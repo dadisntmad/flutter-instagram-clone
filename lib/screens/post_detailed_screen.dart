@@ -40,7 +40,7 @@ class PostDetailedScreen extends StatelessWidget {
       ),
       body: SingleChildScrollView(
         child: PostCard(
-          snap: snap,
+          postId: snap['postId'],
         ),
       ),
     );
