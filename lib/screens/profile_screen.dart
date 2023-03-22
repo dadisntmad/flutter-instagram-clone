@@ -4,6 +4,7 @@ import 'package:instagram/constants.dart';
 import 'package:instagram/screens/post_detailed_screen.dart';
 import 'package:instagram/screens/signin_screen.dart';
 import 'package:instagram/services/auth_service.dart';
+import 'package:instagram/services/firestore_service.dart';
 import 'package:instagram/widgets/custom_button.dart';
 import 'package:instagram/widgets/profile_image.dart';
 
@@ -34,6 +35,10 @@ class ProfileScreen extends StatelessWidget {
                 ),
               );
             }
+
+            final isFollowing = user['followers'].contains(
+              auth.currentUser!.uid,
+            );
 
             return Scaffold(
               appBar: AppBar(
@@ -142,11 +147,17 @@ class ProfileScreen extends StatelessWidget {
                                       child: CustomButton(
                                         width: double.infinity,
                                         height: 30,
-                                        label: 'Follow',
+                                        label:
+                                            isFollowing ? 'Unfollow' : 'Follow',
                                         color: accentBlue,
                                         textColor: Colors.white,
                                         isLoading: false,
-                                        onTap: () {},
+                                        onTap: () async {
+                                          await FirestoreService().follow(
+                                            auth.currentUser!.uid,
+                                            uid,
+                                          );
+                                        },
                                       ),
                                     ),
                                   ],
