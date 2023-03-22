@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:instagram/constants.dart';
 import 'package:instagram/providers/user_provider.dart';
 import 'package:instagram/screens/new_post_screen.dart';
+import 'package:instagram/screens/notifications_screen.dart';
 import 'package:instagram/screens/profile_screen.dart';
 import 'package:instagram/screens/search_screen.dart';
 import 'package:provider/provider.dart';
@@ -44,7 +45,7 @@ class _MainScreenState extends State<MainScreen> {
           const Text('Home'),
           const SearchScreen(),
           const NewPostScreen(),
-          const Text('Notifications'),
+          const NotificationsScreen(),
           ProfileScreen(uid: auth.currentUser!.uid),
         ],
       ),
