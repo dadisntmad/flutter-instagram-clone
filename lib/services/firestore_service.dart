@@ -95,4 +95,37 @@ class FirestoreService {
       print(e.toString());
     }
   }
+
+  // post a comment
+  Future<void> postComment(
+    String uid,
+    String postId,
+    String profileImage,
+    String username,
+    String text,
+  ) async {
+    try {
+      if (text.isNotEmpty) {
+        String commentId = const Uuid().v1();
+
+        await db
+            .collection('posts')
+            .doc(postId)
+            .collection('comments')
+            .doc(commentId)
+            .set(
+          {
+            'uid': uid,
+            'commentId': commentId,
+            'profileImage': profileImage,
+            'username': username,
+            'text': text,
+            'createdAt': DateTime.now(),
+          },
+        );
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+  }
 }

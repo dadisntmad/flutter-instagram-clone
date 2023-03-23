@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:instagram/constants.dart';
 import 'package:instagram/models/user_model.dart';
 import 'package:instagram/providers/user_provider.dart';
+import 'package:instagram/screens/comment_screen.dart';
 import 'package:instagram/services/firestore_service.dart';
 import 'package:instagram/widgets/profile_image.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-class PostCard extends StatelessWidget {
+class PostCard extends StatefulWidget {
   final String postId;
 
   const PostCard({
@@ -16,11 +17,36 @@ class PostCard extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<PostCard> createState() => _PostCardState();
+}
+
+class _PostCardState extends State<PostCard> {
+  int commentsCount = 0;
+
+  void getComments() async {
+    final commentSnap = await db
+        .collection('posts')
+        .doc(widget.postId)
+        .collection('comments')
+        .get();
+
+    commentsCount = commentSnap.docs.length;
+
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    getComments();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final UserModel? user = context.watch<UserProvider>().user;
 
     return StreamBuilder(
-      stream: db.collection('posts').doc(postId).snapshots(),
+      stream: db.collection('posts').doc(widget.postId).snapshots(),
       builder: (BuildContext context, AsyncSnapshot postSnap) {
         final snapshot = postSnap.data;
 
@@ -43,7 +69,9 @@ class PostCard extends StatelessWidget {
                   Row(
                     children: [
                       ProfileImage(
-                          imageUrl: snapshot['profileImage'], size: 30),
+                        imageUrl: snapshot['profileImage'],
+                        size: 30,
+                      ),
                       const SizedBox(width: 10),
                       Text(
                         snapshot['username'],
@@ -126,7 +154,15 @@ class PostCard extends StatelessWidget {
                             ),
                     ),
                     IconButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => CommentScreen(
+                              postId: widget.postId,
+                            ),
+                          ),
+                        );
+                      },
                       icon: Image.asset(
                         'assets/comment.png',
                         width: 24,
@@ -181,16 +217,29 @@ class PostCard extends StatelessWidget {
                       ],
                     ),
                   const SizedBox(height: 4),
-                  const Text(
-                    'View all 3 comments',
-                    style: TextStyle(
-                      color: Colors.grey,
+                  if (commentsCount > 0)
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => CommentScreen(
+                              postId: widget.postId,
+                            ),
+                          ),
+                        );
+                      },
+                      child: Text(
+                        'View all $commentsCount ${commentsCount == 1 ? 'comment' : 'comments'}',
+                        style: const TextStyle(
+                          color: Colors.grey,
+                        ),
+                      ),
                     ),
-                  ),
                   const SizedBox(height: 4),
                   Text(
-                    DateFormat('d MMMM y')
-                        .format(snapshot['datePublished'].toDate()),
+                    DateFormat('d MMMM y').format(
+                      snapshot['datePublished'].toDate(),
+                    ),
                     style: const TextStyle(
                       color: Colors.grey,
                     ),
