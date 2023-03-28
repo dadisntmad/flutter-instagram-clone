@@ -160,6 +160,7 @@ class _PostCardState extends State<PostCard> {
                             builder: (context) => CommentScreen(
                               postId: widget.postId,
                               userPostId: snapshot['uid'],
+                              userPicture: snapshot['profileImage'],
                             ),
                           ),
                         );
@@ -226,6 +227,7 @@ class _PostCardState extends State<PostCard> {
                             builder: (context) => CommentScreen(
                               postId: widget.postId,
                               userPostId: snapshot['uid'],
+                              userPicture: snapshot['profileImage'],
                             ),
                           ),
                         );

@@ -1,10 +1,14 @@
+import 'dart:typed_data';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:instagram/constants.dart';
 import 'package:instagram/screens/post_detailed_screen.dart';
 import 'package:instagram/screens/signin_screen.dart';
 import 'package:instagram/services/auth_service.dart';
 import 'package:instagram/services/firestore_service.dart';
+import 'package:instagram/utils/pick_image.dart';
 import 'package:instagram/widgets/custom_button.dart';
 import 'package:instagram/widgets/profile_image.dart';
 
@@ -74,7 +78,10 @@ class ProfileScreen extends StatelessWidget {
                         children: [
                           Row(
                             children: [
-                              const ProfileImage(size: 65),
+                              ProfileImage(
+                                imageUrl: user['imageUrl'],
+                                size: 65,
+                              ),
                               Expanded(
                                 child: Row(
                                   mainAxisSize: MainAxisSize.max,
@@ -122,7 +129,17 @@ class ProfileScreen extends StatelessWidget {
                                         color: accentGrey,
                                         textColor: Colors.black,
                                         isLoading: false,
-                                        onTap: () {},
+                                        onTap: () {
+                                          showModalBottomSheet(
+                                            useSafeArea: true,
+                                            isScrollControlled: true,
+                                            isDismissible: false,
+                                            context: context,
+                                            builder: (BuildContext context) {
+                                              return _EditProfile(user: user);
+                                            },
+                                          );
+                                        },
                                       ),
                                     ),
                                     const SizedBox(width: 4),
@@ -202,6 +219,125 @@ class ProfileScreen extends StatelessWidget {
           },
         );
       },
+    );
+  }
+}
+
+class _EditProfile extends StatefulWidget {
+  final user;
+
+  const _EditProfile({
+    super.key,
+    required this.user,
+  });
+
+  @override
+  State<_EditProfile> createState() => _EditProfileState();
+}
+
+class _EditProfileState extends State<_EditProfile> {
+  Uint8List? _file;
+  final _nameController = TextEditingController();
+  final _usernameController = TextEditingController();
+
+  void _onUpdateProfile() async {
+    await FirestoreService().updateProfile(
+      context,
+      _file!,
+      _nameController.text,
+      _usernameController.text,
+    );
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _usernameController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.white,
+        leading: TextButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: const Text(
+            'Cancel',
+            style: TextStyle(
+              color: Colors.black,
+              fontWeight: FontWeight.normal,
+            ),
+          ),
+        ),
+        leadingWidth: 75,
+        title: const Text(
+          'Edit Profile',
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        centerTitle: true,
+        actions: [
+          TextButton(
+            onPressed: () {
+              _onUpdateProfile();
+              Navigator.of(context).pop();
+            },
+            child: const Text('Done'),
+          ),
+        ],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(
+          14.0,
+        ),
+        child: Column(
+          children: [
+            GestureDetector(
+              onTap: () async {
+                Uint8List file = await pickImage(ImageSource.gallery);
+
+                setState(() {
+                  _file = file;
+                });
+              },
+              child: ProfileImage(
+                imageUrl: widget.user['imageUrl'],
+                size: 50,
+              ),
+            ),
+            TextField(
+              controller: _nameController..text = widget.user['fullName'],
+              decoration: const InputDecoration(
+                hintText: 'Name',
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Colors.grey,
+                  ),
+                ),
+              ),
+            ),
+            TextField(
+              controller: _usernameController..text = widget.user['username'],
+              decoration: const InputDecoration(
+                hintText: 'Username',
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Colors.grey,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

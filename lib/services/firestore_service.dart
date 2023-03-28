@@ -1,9 +1,11 @@
 import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:instagram/constants.dart';
 import 'package:instagram/models/post_model.dart';
 import 'package:instagram/services/storage_service.dart';
+import 'package:instagram/utils/update_user_data.dart';
 import 'package:uuid/uuid.dart';
 
 class FirestoreService {
@@ -137,5 +139,27 @@ class FirestoreService {
         .collection('comments')
         .doc(commentId)
         .delete();
+  }
+
+  // update user profile
+  Future<void> updateProfile(
+    BuildContext context,
+    Uint8List image,
+    String name,
+    String username,
+  ) async {
+    String imageUrl = await StorageService()
+        .uploadFileToStorage('profileImages', image, false);
+
+    await db.collection('users').doc(auth.currentUser!.uid).update({
+      'imageUrl': imageUrl,
+      'fullName': name,
+      'username': username,
+    });
+
+    await updateUserDataInCollection('posts', {
+      'profileImage': imageUrl,
+      'username': username,
+    });
   }
 }

@@ -11,11 +11,13 @@ import 'package:provider/provider.dart';
 class CommentScreen extends StatefulWidget {
   final String postId;
   final String userPostId;
+  final String userPicture;
 
   const CommentScreen({
     Key? key,
     required this.postId,
     required this.userPostId,
+    required this.userPicture,
   }) : super(key: key);
 
   @override
@@ -160,7 +162,7 @@ class _CommentScreenState extends State<CommentScreen> {
           ),
           child: Row(
             children: [
-              ProfileImage(imageUrl: user?.imageUrl, size: 35),
+              ProfileImage(imageUrl: widget.userPicture, size: 35),
               const SizedBox(width: 5),
               Expanded(
                 child: TextField(
