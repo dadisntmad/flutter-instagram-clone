@@ -128,4 +128,14 @@ class FirestoreService {
       print(e.toString());
     }
   }
+
+  // delete a comment
+  Future<void> deleteComment(String postId, String commentId) async {
+    await db
+        .collection('posts')
+        .doc(postId)
+        .collection('comments')
+        .doc(commentId)
+        .delete();
+  }
 }

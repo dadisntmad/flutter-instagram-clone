@@ -10,8 +10,13 @@ import 'package:provider/provider.dart';
 
 class CommentScreen extends StatefulWidget {
   final String postId;
+  final String userPostId;
 
-  const CommentScreen({Key? key, required this.postId}) : super(key: key);
+  const CommentScreen({
+    Key? key,
+    required this.postId,
+    required this.userPostId,
+  }) : super(key: key);
 
   @override
   State<CommentScreen> createState() => _CommentScreenState();
@@ -120,6 +125,21 @@ class _CommentScreenState extends State<CommentScreen> {
                             ],
                           ),
                         ),
+                        if (widget.userPostId == user?.uid ||
+                            user?.uid == data['uid'])
+                          IconButton(
+                            onPressed: () async {
+                              await FirestoreService().deleteComment(
+                                widget.postId,
+                                data['commentId'],
+                              );
+                            },
+                            iconSize: 14,
+                            color: Colors.grey,
+                            icon: const Icon(
+                              Icons.close,
+                            ),
+                          ),
                       ],
                     ),
                   ),

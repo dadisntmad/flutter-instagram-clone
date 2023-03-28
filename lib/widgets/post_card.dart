@@ -159,6 +159,7 @@ class _PostCardState extends State<PostCard> {
                           MaterialPageRoute(
                             builder: (context) => CommentScreen(
                               postId: widget.postId,
+                              userPostId: snapshot['uid'],
                             ),
                           ),
                         );
@@ -224,6 +225,7 @@ class _PostCardState extends State<PostCard> {
                           MaterialPageRoute(
                             builder: (context) => CommentScreen(
                               postId: widget.postId,
+                              userPostId: snapshot['uid'],
                             ),
                           ),
                         );
