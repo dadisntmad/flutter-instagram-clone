@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram/constants.dart';
 import 'package:instagram/screens/profile_screen.dart';
+import 'package:instagram/widgets/loader.dart';
 import 'package:instagram/widgets/profile_image.dart';
 
 class SearchResultScreen extends StatelessWidget {
@@ -23,11 +24,7 @@ class SearchResultScreen extends StatelessWidget {
         builder: (BuildContext context,
             AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(
-                color: Colors.black,
-              ),
-            );
+            return const Loader();
           }
           return ListView.builder(
             itemCount: snapshot.data!.docs.length,

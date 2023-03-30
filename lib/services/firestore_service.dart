@@ -84,6 +84,13 @@ class FirestoreService {
         await db.collection('users').doc(uid).update({
           'following': FieldValue.arrayRemove([followId]),
         });
+
+        await db
+            .collection('following')
+            .doc(uid)
+            .collection('posts')
+            .doc(followId)
+            .delete();
       } else {
         await db.collection('users').doc(followId).update({
           'followers': FieldValue.arrayUnion([uid]),
@@ -92,6 +99,13 @@ class FirestoreService {
         await db.collection('users').doc(uid).update({
           'following': FieldValue.arrayUnion([followId]),
         });
+
+        await db
+            .collection('following')
+            .doc(uid)
+            .collection('posts')
+            .doc(followId)
+            .set({});
       }
     } catch (e) {
       print(e.toString());

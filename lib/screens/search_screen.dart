@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:instagram/constants.dart';
 import 'package:instagram/screens/post_detailed_screen.dart';
 import 'package:instagram/screens/search_result_screen.dart';
+import 'package:instagram/widgets/loader.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({Key? key}) : super(key: key);
@@ -58,11 +59,7 @@ class _SearchScreenState extends State<SearchScreen> {
         builder: (BuildContext context,
             AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(
-                color: Colors.black,
-              ),
-            );
+            return const Loader();
           }
           return _isSearching
               ? SearchResultScreen(

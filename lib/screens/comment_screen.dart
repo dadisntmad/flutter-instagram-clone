@@ -4,6 +4,7 @@ import 'package:instagram/constants.dart';
 import 'package:instagram/models/user_model.dart';
 import 'package:instagram/providers/user_provider.dart';
 import 'package:instagram/services/firestore_service.dart';
+import 'package:instagram/widgets/loader.dart';
 import 'package:instagram/widgets/profile_image.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -74,11 +75,7 @@ class _CommentScreenState extends State<CommentScreen> {
         builder: (BuildContext context,
             AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(
-                color: Colors.black,
-              ),
-            );
+            return const Loader();
           }
           return ListView.builder(
             itemCount: snapshot.data!.docs.length,

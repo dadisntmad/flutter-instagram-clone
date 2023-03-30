@@ -4,6 +4,7 @@ import 'package:instagram/constants.dart';
 import 'package:instagram/screens/profile_screen.dart';
 import 'package:instagram/services/firestore_service.dart';
 import 'package:instagram/widgets/custom_button.dart';
+import 'package:instagram/widgets/loader.dart';
 import 'package:instagram/widgets/profile_image.dart';
 
 class NotificationsScreen extends StatelessWidget {
@@ -30,11 +31,7 @@ class NotificationsScreen extends StatelessWidget {
         builder: (BuildContext context,
             AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(
-                color: Colors.black,
-              ),
-            );
+            return const Loader();
           }
           return ListView.builder(
             keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,

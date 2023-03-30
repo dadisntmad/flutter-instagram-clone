@@ -10,6 +10,7 @@ import 'package:instagram/services/auth_service.dart';
 import 'package:instagram/services/firestore_service.dart';
 import 'package:instagram/utils/pick_image.dart';
 import 'package:instagram/widgets/custom_button.dart';
+import 'package:instagram/widgets/loader.dart';
 import 'package:instagram/widgets/profile_image.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -26,18 +27,17 @@ class ProfileScreen extends StatelessWidget {
       stream: db.collection('users').doc(uid).snapshots(),
       builder: (BuildContext context, AsyncSnapshot userSnapshot) {
         return StreamBuilder(
-          stream:
-              db.collection('posts').where('uid', isEqualTo: uid).snapshots(),
+          stream: db
+              .collection('posts')
+              .where('uid', isEqualTo: uid)
+              .orderBy('datePublished', descending: true)
+              .snapshots(),
           builder: (BuildContext context,
               AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> postSnapshot) {
             final user = userSnapshot.data;
 
             if (postSnapshot.connectionState == ConnectionState.waiting) {
-              return const Center(
-                child: CircularProgressIndicator(
-                  color: Colors.black,
-                ),
-              );
+              return const Loader();
             }
 
             final isFollowing = user['followers'].contains(

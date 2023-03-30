@@ -4,6 +4,7 @@ import 'package:instagram/models/user_model.dart';
 import 'package:instagram/providers/user_provider.dart';
 import 'package:instagram/screens/comment_screen.dart';
 import 'package:instagram/services/firestore_service.dart';
+import 'package:instagram/widgets/loader.dart';
 import 'package:instagram/widgets/profile_image.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -32,7 +33,9 @@ class _PostCardState extends State<PostCard> {
 
     commentsCount = commentSnap.docs.length;
 
-    setState(() {});
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   @override
@@ -51,11 +54,7 @@ class _PostCardState extends State<PostCard> {
         final snapshot = postSnap.data;
 
         if (postSnap.connectionState == ConnectionState.waiting) {
-          return const Center(
-            child: CircularProgressIndicator(
-              color: Colors.black,
-            ),
-          );
+          return const Loader();
         }
 
         return Column(

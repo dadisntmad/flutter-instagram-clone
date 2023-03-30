@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:instagram/constants.dart';
 import 'package:instagram/providers/user_provider.dart';
+import 'package:instagram/screens/home_screen.dart';
 import 'package:instagram/screens/new_post_screen.dart';
 import 'package:instagram/screens/notifications_screen.dart';
 import 'package:instagram/screens/profile_screen.dart';
@@ -42,7 +43,7 @@ class _MainScreenState extends State<MainScreen> {
       body: IndexedStack(
         index: _currentIndex,
         children: [
-          const Text('Home'),
+          const HomeScreen(),
           const SearchScreen(),
           const NewPostScreen(),
           const NotificationsScreen(),
