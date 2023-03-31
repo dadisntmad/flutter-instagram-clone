@@ -50,14 +50,17 @@ class HomeScreen extends StatelessWidget {
                 .where('uid', whereIn: following)
                 .orderBy('datePublished', descending: true)
                 .get(),
-            builder: (BuildContext context, AsyncSnapshot snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
+            builder: (BuildContext context,
+                AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>>
+                    postSnapshot) {
+              if (postSnapshot.connectionState == ConnectionState.waiting) {
                 return const Loader();
               }
               return ListView.builder(
-                itemCount: snapshot.data!.docs.length,
+                itemExtent: 670,
+                itemCount: postSnapshot.data!.docs.length,
                 itemBuilder: (BuildContext context, int index) {
-                  final post = snapshot.data!.docs[index];
+                  final post = postSnapshot.data!.docs[index];
 
                   return PostCard(postId: post['postId']);
                 },

@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram/constants.dart';
 import 'package:instagram/models/user_model.dart';
@@ -123,11 +124,11 @@ class _PostCardState extends State<PostCard> {
                   snapshot['likes'],
                 );
               },
-              child: Image.network(
-                snapshot['postUrl'],
+              child: CachedNetworkImage(
+                imageUrl: snapshot['postUrl'],
+                fit: BoxFit.cover,
                 width: double.infinity,
                 height: 500,
-                fit: BoxFit.cover,
               ),
             ),
             Row(

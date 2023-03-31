@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 class ProfileImage extends StatelessWidget {
@@ -16,9 +17,12 @@ class ProfileImage extends StatelessWidget {
         ? SizedBox(
             width: size,
             height: size,
-            child: CircleAvatar(
-              backgroundImage: NetworkImage('$imageUrl'),
-              radius: size,
+            child: CachedNetworkImage(
+              imageUrl: imageUrl.toString(),
+              imageBuilder: (context, imageProvider) => CircleAvatar(
+                radius: size,
+                backgroundImage: imageProvider,
+              ),
             ),
           )
         : Image.asset(
