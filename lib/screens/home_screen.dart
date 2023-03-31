@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:instagram/constants.dart';
+import 'package:instagram/screens/messages_screen.dart';
 import 'package:instagram/widgets/loader.dart';
 import 'package:instagram/widgets/post_card.dart';
 
@@ -23,7 +24,9 @@ class HomeScreen extends StatelessWidget {
         centerTitle: false,
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.of(context).push(MessagesScreen.route());
+            },
             icon: Image.asset('assets/messenger.png', width: 24, height: 24),
           ),
         ],
