@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:instagram/screens/chat_screen.dart';
 import 'package:instagram/widgets/profile_image.dart';
 
 class MessagesScreen extends StatelessWidget {
@@ -43,7 +44,13 @@ class MessagesScreen extends StatelessWidget {
         itemCount: 25,
         itemBuilder: (BuildContext context, int index) {
           return InkWell(
-            onTap: () {},
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => ChatScreen(chatId: index),
+                ),
+              );
+            },
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
               child: Column(

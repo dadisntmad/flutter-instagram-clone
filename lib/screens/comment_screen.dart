@@ -12,13 +12,11 @@ import 'package:provider/provider.dart';
 class CommentScreen extends StatefulWidget {
   final String postId;
   final String userPostId;
-  final String userPicture;
 
   const CommentScreen({
     Key? key,
     required this.postId,
     required this.userPostId,
-    required this.userPicture,
   }) : super(key: key);
 
   @override
@@ -74,78 +72,79 @@ class _CommentScreenState extends State<CommentScreen> {
             .snapshots(),
         builder: (BuildContext context,
             AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Loader();
-          }
-          return ListView.builder(
-            itemCount: snapshot.data!.docs.length,
-            itemBuilder: (BuildContext context, int index) {
-              final data = snapshot.data!.docs[index].data();
-              final date = DateFormat('d MMM y').format(
-                data['createdAt'].toDate(),
-              );
+          if (snapshot.hasData) {
+            return ListView.builder(
+              itemCount: snapshot.data!.docs.length,
+              itemBuilder: (BuildContext context, int index) {
+                final data = snapshot.data!.docs[index].data();
+                final date = DateFormat('d MMM y').format(
+                  data['createdAt'].toDate(),
+                );
 
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        ProfileImage(imageUrl: data['profileImage'], size: 30),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Text(
-                                    '${data['username']}',
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w500,
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ProfileImage(
+                              imageUrl: data['profileImage'], size: 30),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Text(
+                                      '${data['username']}',
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w500,
+                                      ),
                                     ),
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    date,
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.grey,
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      date,
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey,
+                                      ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                              Text(
-                                '${data['text']}',
-                              ),
-                            ],
-                          ),
-                        ),
-                        if (widget.userPostId == user?.uid ||
-                            user?.uid == data['uid'])
-                          IconButton(
-                            onPressed: () async {
-                              await FirestoreService().deleteComment(
-                                widget.postId,
-                                data['commentId'],
-                              );
-                            },
-                            iconSize: 14,
-                            color: Colors.grey,
-                            icon: const Icon(
-                              Icons.close,
+                                  ],
+                                ),
+                                Text(
+                                  '${data['text']}',
+                                ),
+                              ],
                             ),
                           ),
-                      ],
+                          if (widget.userPostId == user?.uid ||
+                              user?.uid == data['uid'])
+                            IconButton(
+                              onPressed: () async {
+                                await FirestoreService().deleteComment(
+                                  widget.postId,
+                                  data['commentId'],
+                                );
+                              },
+                              iconSize: 14,
+                              color: Colors.grey,
+                              icon: const Icon(
+                                Icons.close,
+                              ),
+                            ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              );
-            },
-          );
+                  ],
+                );
+              },
+            );
+          }
+          return const Loader();
         },
       ),
       bottomNavigationBar: Padding(
@@ -159,7 +158,7 @@ class _CommentScreenState extends State<CommentScreen> {
           ),
           child: Row(
             children: [
-              ProfileImage(imageUrl: widget.userPicture, size: 35),
+              ProfileImage(imageUrl: user?.imageUrl, size: 35),
               const SizedBox(width: 5),
               Expanded(
                 child: TextField(
