@@ -47,7 +47,7 @@ class MessagesScreen extends StatelessWidget {
             onTap: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (context) => ChatScreen(chatId: index),
+                  builder: (context) => ChatScreen(chatId: index.toString()),
                 ),
               );
             },

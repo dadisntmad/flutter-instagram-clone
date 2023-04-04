@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:instagram/constants.dart';
+import 'package:instagram/screens/chat_screen.dart';
 import 'package:instagram/screens/post_detailed_screen.dart';
 import 'package:instagram/screens/signin_screen.dart';
 import 'package:instagram/services/auth_service.dart';
@@ -192,7 +193,14 @@ class ProfileScreen extends StatelessWidget {
                                           color: accentGrey,
                                           textColor: Colors.black,
                                           isLoading: false,
-                                          onTap: () {},
+                                          onTap: () {
+                                            Navigator.of(context).push(
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    ChatScreen(chatId: uid),
+                                              ),
+                                            );
+                                          },
                                         ),
                                       ),
                                     ],

@@ -3,7 +3,10 @@ import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:instagram/constants.dart';
+import 'package:instagram/models/message_model.dart';
+import 'package:instagram/models/messages_model.dart';
 import 'package:instagram/models/post_model.dart';
+import 'package:instagram/models/user_model.dart';
 import 'package:instagram/services/storage_service.dart';
 import 'package:instagram/utils/update_user_data.dart';
 import 'package:uuid/uuid.dart';
@@ -175,5 +178,121 @@ class FirestoreService {
       'profileImage': imageUrl,
       'username': username,
     });
+  }
+
+  void _saveDataOnMessageScreen(
+    UserModel senderUserData,
+    UserModel receiverUserData,
+    String text,
+    DateTime timeSent,
+    String receiverUserId,
+  ) async {
+    var receiverUserChat = MessagesModel(
+      username: senderUserData.username,
+      profilePicture: senderUserData.imageUrl,
+      chatId: senderUserData.uid,
+      timeSent: timeSent,
+      lastMessage: text,
+    );
+
+    await db
+        .collection('users')
+        .doc(receiverUserId)
+        .collection('chats')
+        .doc(auth.currentUser!.uid)
+        .set(
+          receiverUserChat.toMap(),
+        );
+
+    var senderUserChat = MessagesModel(
+      username: receiverUserData.username,
+      profilePicture: receiverUserData.imageUrl,
+      chatId: receiverUserData.uid,
+      timeSent: timeSent,
+      lastMessage: text,
+    );
+
+    await db
+        .collection('users')
+        .doc(auth.currentUser!.uid)
+        .collection('chats')
+        .doc(receiverUserId)
+        .set(
+          senderUserChat.toMap(),
+        );
+  }
+
+  void _saveDataOnChatScreen(
+    String receiverUserId,
+    String text,
+    DateTime timeSent,
+    String messageId,
+    String senderUsername,
+    String receiverUsername,
+  ) async {
+    final message = MessageModel(
+      senderId: auth.currentUser!.uid,
+      receiverId: receiverUserId,
+      text: text,
+      timeSent: timeSent,
+      messageId: messageId,
+      isSeen: false,
+    );
+
+    await db
+        .collection('users')
+        .doc(auth.currentUser!.uid)
+        .collection('chats')
+        .doc(receiverUserId)
+        .collection('messages')
+        .doc(messageId)
+        .set(
+          message.toMap(),
+        );
+
+    await db
+        .collection('users')
+        .doc(receiverUserId)
+        .collection('chats')
+        .doc(auth.currentUser!.uid)
+        .collection('messages')
+        .doc(messageId)
+        .set(
+          message.toMap(),
+        );
+  }
+
+  // send message
+  void sendMessage({
+    required String text,
+    required String receiverId,
+    required UserModel sender,
+  }) async {
+    try {
+      final messageId = const Uuid().v1();
+      var timeSent = DateTime.now();
+      UserModel receiverData;
+      var userDataMap = await db.collection('users').doc(receiverId).get();
+      receiverData = UserModel.fromMap(userDataMap.data()!);
+
+      _saveDataOnMessageScreen(
+        sender,
+        receiverData,
+        text,
+        timeSent,
+        receiverId,
+      );
+
+      _saveDataOnChatScreen(
+        receiverId,
+        text,
+        timeSent,
+        messageId,
+        sender.username,
+        receiverData.username,
+      );
+    } catch (e) {
+      print(e.toString());
+    }
   }
 }

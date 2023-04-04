@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:instagram/constants.dart';
+import 'package:instagram/providers/user_provider.dart';
+import 'package:instagram/services/firestore_service.dart';
 import 'package:instagram/widgets/profile_image.dart';
 import 'package:instagram/widgets/receiver_message_card.dart';
 import 'package:instagram/widgets/sender_message_card.dart';
+import 'package:provider/provider.dart';
 
 class ChatScreen extends StatelessWidget {
-  final int chatId;
+  final String chatId;
 
   const ChatScreen({Key? key, required this.chatId}) : super(key: key);
 
@@ -76,38 +79,78 @@ class ChatScreen extends StatelessWidget {
           );
         },
       ),
-      bottomNavigationBar: Padding(
-        padding: MediaQuery.of(context).viewInsets,
-        child: Padding(
-          padding: const EdgeInsets.all(14.0),
-          child: Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  decoration: InputDecoration(
-                    hintText: 'Message...',
-                    filled: true,
-                    fillColor: accentGrey,
-                    isDense: true,
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(24),
-                      borderSide: const BorderSide(
-                        color: Colors.transparent,
-                      ),
+      bottomNavigationBar: const BottomTextField(
+        receiverId: 'nyprerwyOffLjZpit5o6CTD6rZg2',
+      ),
+    );
+  }
+}
+
+class BottomTextField extends StatefulWidget {
+  final String receiverId;
+  const BottomTextField({Key? key, required this.receiverId}) : super(key: key);
+
+  @override
+  State<BottomTextField> createState() => _BottomTextFieldState();
+}
+
+class _BottomTextFieldState extends State<BottomTextField> {
+  final _messageController = TextEditingController();
+
+  @override
+  void dispose() {
+    _messageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final user = context.watch<UserProvider>().user;
+
+    return Padding(
+      padding: MediaQuery.of(context).viewInsets,
+      child: Padding(
+        padding: const EdgeInsets.all(14.0),
+        child: Row(
+          children: [
+            Expanded(
+              child: TextField(
+                controller: _messageController,
+                decoration: InputDecoration(
+                  hintText: 'Message...',
+                  filled: true,
+                  fillColor: accentGrey,
+                  isDense: true,
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(24),
+                    borderSide: const BorderSide(
+                      color: Colors.transparent,
                     ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(24),
-                      borderSide: const BorderSide(
-                        color: Colors.transparent,
-                      ),
-                    ),
-                    contentPadding: const EdgeInsets.all(10),
                   ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(24),
+                    borderSide: const BorderSide(
+                      color: Colors.transparent,
+                    ),
+                  ),
+                  contentPadding: const EdgeInsets.all(10),
                 ),
               ),
-              TextButton(onPressed: () {}, child: const Text('Send')),
-            ],
-          ),
+            ),
+            TextButton(
+              onPressed: () {
+                if (_messageController.text.trim().isNotEmpty) {
+                  FirestoreService().sendMessage(
+                    text: _messageController.text,
+                    receiverId: widget.receiverId,
+                    sender: user!,
+                  );
+                  _messageController.clear();
+                }
+              },
+              child: const Text('Send'),
+            ),
+          ],
         ),
       ),
     );

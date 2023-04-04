@@ -42,4 +42,16 @@ class UserModel {
       followers: snap['followers'],
     );
   }
+
+  factory UserModel.fromMap(Map<String, dynamic> map) {
+    return UserModel(
+      uid: map['uid'],
+      username: map['username'],
+      email: map['email'],
+      imageUrl: map['imageUrl'],
+      fullName: map['fullName'],
+      following: map['following'],
+      followers: map['followers'],
+    );
+  }
 }
