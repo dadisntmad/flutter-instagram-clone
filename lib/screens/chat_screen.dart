@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:instagram/constants.dart';
 import 'package:instagram/providers/user_provider.dart';
 import 'package:instagram/services/firestore_service.dart';
@@ -9,7 +10,7 @@ import 'package:instagram/widgets/receiver_message_card.dart';
 import 'package:instagram/widgets/sender_message_card.dart';
 import 'package:provider/provider.dart';
 
-class ChatScreen extends StatelessWidget {
+class ChatScreen extends StatefulWidget {
   final String chatId;
   final String profilePicture;
   final String fullName;
@@ -24,6 +25,19 @@ class ChatScreen extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<ChatScreen> createState() => _ChatScreenState();
+}
+
+class _ChatScreenState extends State<ChatScreen> {
+  final _automaticScrollController = ScrollController();
+
+  @override
+  void dispose() {
+    _automaticScrollController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -32,13 +46,13 @@ class ChatScreen extends StatelessWidget {
         leading: const BackButton(color: Colors.black),
         title: Row(
           children: [
-            ProfileImage(imageUrl: profilePicture, size: 25),
+            ProfileImage(imageUrl: widget.profilePicture, size: 25),
             const SizedBox(width: 6),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  fullName,
+                  widget.fullName,
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.normal,
@@ -46,7 +60,7 @@ class ChatScreen extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  username,
+                  widget.username,
                   style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.normal,
@@ -79,18 +93,32 @@ class ChatScreen extends StatelessWidget {
             .collection('users')
             .doc(auth.currentUser!.uid)
             .collection('chats')
-            .doc(chatId)
+            .doc(widget.chatId)
             .collection('messages')
             .orderBy('timeSent', descending: false)
             .snapshots(),
         builder: (BuildContext context,
             AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
           if (snapshot.hasData) {
+            // automatic scrolling
+            SchedulerBinding.instance.addPostFrameCallback((_) {
+              _automaticScrollController
+                  .jumpTo(_automaticScrollController.position.maxScrollExtent);
+            });
+
             return ListView.builder(
+              controller: _automaticScrollController,
               itemCount: snapshot.data!.docs.length,
               itemBuilder: (BuildContext context, int index) {
                 final message = snapshot.data!.docs[index];
 
+                if (!message['isSeen'] &&
+                    message['receiverId'] == auth.currentUser!.uid) {
+                  FirestoreService().markMessageSeen(
+                    widget.chatId,
+                    message['messageId'],
+                  );
+                }
                 return Padding(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
@@ -100,6 +128,7 @@ class ChatScreen extends StatelessWidget {
                       if (auth.currentUser!.uid == message['senderId'])
                         SenderMessageCard(
                           message: message['text'],
+                          isSeen: message['isSeen'],
                         ),
                       if (auth.currentUser!.uid == message['receiverId'])
                         ReceiverMessageCard(
@@ -116,7 +145,7 @@ class ChatScreen extends StatelessWidget {
         },
       ),
       bottomNavigationBar: BottomTextField(
-        receiverId: chatId,
+        receiverId: widget.chatId,
       ),
     );
   }

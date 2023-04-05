@@ -300,4 +300,33 @@ class FirestoreService {
       print(e.toString());
     }
   }
+
+  // mark message as seen
+  void markMessageSeen(String receiverUserId, String messageId) async {
+    try {
+      await db
+          .collection('users')
+          .doc(auth.currentUser!.uid)
+          .collection('chats')
+          .doc(receiverUserId)
+          .collection('messages')
+          .doc(messageId)
+          .update({
+        'isSeen': true,
+      });
+
+      await db
+          .collection('users')
+          .doc(receiverUserId)
+          .collection('chats')
+          .doc(auth.currentUser!.uid)
+          .collection('messages')
+          .doc(messageId)
+          .update({
+        'isSeen': true,
+      });
+    } catch (e) {
+      print(e.toString());
+    }
+  }
 }

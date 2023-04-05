@@ -2,8 +2,13 @@ import 'package:flutter/material.dart';
 
 class SenderMessageCard extends StatelessWidget {
   final String message;
+  final bool isSeen;
 
-  const SenderMessageCard({Key? key, required this.message}) : super(key: key);
+  const SenderMessageCard({
+    Key? key,
+    required this.message,
+    required this.isSeen,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -32,9 +37,9 @@ class SenderMessageCard extends StatelessWidget {
                 ),
               ),
             ),
-            const Text(
-              'Seen',
-              style: TextStyle(
+            Text(
+              isSeen ? 'Seen' : '',
+              style: const TextStyle(
                 fontSize: 12,
                 color: Colors.grey,
               ),
