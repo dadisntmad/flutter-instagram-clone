@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 class SenderMessageCard extends StatelessWidget {
-  const SenderMessageCard({Key? key}) : super(key: key);
+  final String message;
+
+  const SenderMessageCard({Key? key, required this.message}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -22,11 +24,11 @@ class SenderMessageCard extends StatelessWidget {
                 ),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Padding(
-                padding: EdgeInsets.all(8.0),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
                 child: Text(
-                  'sender message sender message sender message sender message sender message sender message sender message sender message sender message sender message sender message',
-                  style: TextStyle(color: Colors.white),
+                  message,
+                  style: const TextStyle(color: Colors.white),
                 ),
               ),
             ),

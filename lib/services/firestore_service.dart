@@ -189,6 +189,7 @@ class FirestoreService {
   ) async {
     var receiverUserChat = MessagesModel(
       username: senderUserData.username,
+      fullName: senderUserData.fullName,
       profilePicture: senderUserData.imageUrl,
       chatId: senderUserData.uid,
       timeSent: timeSent,
@@ -206,6 +207,7 @@ class FirestoreService {
 
     var senderUserChat = MessagesModel(
       username: receiverUserData.username,
+      fullName: receiverUserData.fullName,
       profilePicture: receiverUserData.imageUrl,
       chatId: receiverUserData.uid,
       timeSent: timeSent,
@@ -229,10 +231,12 @@ class FirestoreService {
     String messageId,
     String senderUsername,
     String receiverUsername,
+    String senderImageUrl,
   ) async {
     final message = MessageModel(
       senderId: auth.currentUser!.uid,
       receiverId: receiverUserId,
+      senderImageUrl: senderImageUrl,
       text: text,
       timeSent: timeSent,
       messageId: messageId,
@@ -290,6 +294,7 @@ class FirestoreService {
         messageId,
         sender.username,
         receiverData.username,
+        sender.imageUrl,
       );
     } catch (e) {
       print(e.toString());

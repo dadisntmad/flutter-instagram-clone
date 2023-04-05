@@ -1,5 +1,6 @@
 class MessageModel {
   final String senderId;
+  final String senderImageUrl;
   final String receiverId;
   final String text;
   final DateTime timeSent;
@@ -8,6 +9,7 @@ class MessageModel {
 
   MessageModel({
     required this.senderId,
+    required this.senderImageUrl,
     required this.receiverId,
     required this.text,
     required this.timeSent,
@@ -18,6 +20,7 @@ class MessageModel {
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'senderId': senderId,
+      'senderImageUrl': senderImageUrl,
       'receiverId': receiverId,
       'text': text,
       'timeSent': timeSent.millisecondsSinceEpoch,
@@ -29,6 +32,7 @@ class MessageModel {
   factory MessageModel.fromMap(Map<String, dynamic> map) {
     return MessageModel(
       senderId: map['senderId'] as String,
+      senderImageUrl: map['senderImageUrl'] as String,
       receiverId: map['receiverId'] as String,
       text: map['text'] as String,
       timeSent: DateTime.fromMillisecondsSinceEpoch(map['timeSent'] as int),

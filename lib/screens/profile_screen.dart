@@ -197,7 +197,13 @@ class ProfileScreen extends StatelessWidget {
                                             Navigator.of(context).push(
                                               MaterialPageRoute(
                                                 builder: (context) =>
-                                                    ChatScreen(chatId: uid),
+                                                    ChatScreen(
+                                                  chatId: uid,
+                                                  profilePicture:
+                                                      user['imageUrl'],
+                                                  fullName: user['fullName'],
+                                                  username: user['username'],
+                                                ),
                                               ),
                                             );
                                           },

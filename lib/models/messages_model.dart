@@ -1,5 +1,6 @@
 class MessagesModel {
   final String username;
+  final String fullName;
   final String profilePicture;
   final String chatId;
   final DateTime timeSent;
@@ -7,6 +8,7 @@ class MessagesModel {
 
   MessagesModel({
     required this.username,
+    required this.fullName,
     required this.profilePicture,
     required this.chatId,
     required this.timeSent,
@@ -16,6 +18,7 @@ class MessagesModel {
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'username': username,
+      'fullName': fullName,
       'profilePicture': profilePicture,
       'chatId': chatId,
       'timeSent': timeSent.millisecondsSinceEpoch,
@@ -26,6 +29,7 @@ class MessagesModel {
   factory MessagesModel.fromMap(Map<String, dynamic> map) {
     return MessagesModel(
       username: map['username'] as String,
+      fullName: map['fullName'] as String,
       profilePicture: map['profilePicture'] as String,
       chatId: map['chatId'] as String,
       timeSent: DateTime.fromMillisecondsSinceEpoch(map['timeSent'] as int),

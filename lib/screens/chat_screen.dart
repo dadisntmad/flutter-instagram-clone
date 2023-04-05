@@ -1,7 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram/constants.dart';
 import 'package:instagram/providers/user_provider.dart';
 import 'package:instagram/services/firestore_service.dart';
+import 'package:instagram/widgets/loader.dart';
 import 'package:instagram/widgets/profile_image.dart';
 import 'package:instagram/widgets/receiver_message_card.dart';
 import 'package:instagram/widgets/sender_message_card.dart';
@@ -9,8 +11,17 @@ import 'package:provider/provider.dart';
 
 class ChatScreen extends StatelessWidget {
   final String chatId;
+  final String profilePicture;
+  final String fullName;
+  final String username;
 
-  const ChatScreen({Key? key, required this.chatId}) : super(key: key);
+  const ChatScreen({
+    Key? key,
+    required this.chatId,
+    required this.profilePicture,
+    required this.fullName,
+    required this.username,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -21,22 +32,22 @@ class ChatScreen extends StatelessWidget {
         leading: const BackButton(color: Colors.black),
         title: Row(
           children: [
-            const ProfileImage(size: 25),
+            ProfileImage(imageUrl: profilePicture, size: 25),
             const SizedBox(width: 6),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
+              children: [
                 Text(
-                  'full name',
-                  style: TextStyle(
+                  fullName,
+                  style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.normal,
                     color: Colors.black,
                   ),
                 ),
                 Text(
-                  'username',
-                  style: TextStyle(
+                  username,
+                  style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.normal,
                     color: Colors.grey,
@@ -63,24 +74,49 @@ class ChatScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: ListView.builder(
-        itemCount: 25,
-        itemBuilder: (BuildContext context, int index) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
-                ReceiverMessageCard(),
-                SizedBox(height: 8),
-                SenderMessageCard(),
-              ],
-            ),
-          );
+      body: StreamBuilder(
+        stream: db
+            .collection('users')
+            .doc(auth.currentUser!.uid)
+            .collection('chats')
+            .doc(chatId)
+            .collection('messages')
+            .orderBy('timeSent', descending: false)
+            .snapshots(),
+        builder: (BuildContext context,
+            AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
+          if (snapshot.hasData) {
+            return ListView.builder(
+              itemCount: snapshot.data!.docs.length,
+              itemBuilder: (BuildContext context, int index) {
+                final message = snapshot.data!.docs[index];
+
+                return Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (auth.currentUser!.uid == message['senderId'])
+                        SenderMessageCard(
+                          message: message['text'],
+                        ),
+                      if (auth.currentUser!.uid == message['receiverId'])
+                        ReceiverMessageCard(
+                          message: message['text'],
+                          imageUrl: message['senderImageUrl'],
+                        ),
+                    ],
+                  ),
+                );
+              },
+            );
+          }
+          return const Loader();
         },
       ),
-      bottomNavigationBar: const BottomTextField(
-        receiverId: 'nyprerwyOffLjZpit5o6CTD6rZg2',
+      bottomNavigationBar: BottomTextField(
+        receiverId: chatId,
       ),
     );
   }

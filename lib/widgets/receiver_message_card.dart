@@ -3,7 +3,14 @@ import 'package:instagram/constants.dart';
 import 'package:instagram/widgets/profile_image.dart';
 
 class ReceiverMessageCard extends StatelessWidget {
-  const ReceiverMessageCard({Key? key}) : super(key: key);
+  final String message;
+  final String imageUrl;
+
+  const ReceiverMessageCard({
+    Key? key,
+    required this.message,
+    required this.imageUrl,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +21,7 @@ class ReceiverMessageCard extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            const ProfileImage(size: 20),
+            ProfileImage(imageUrl: imageUrl, size: 20),
             const SizedBox(width: 4),
             Expanded(
               child: Container(
@@ -22,11 +29,9 @@ class ReceiverMessageCard extends StatelessWidget {
                   color: accentGrey,
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text(
-                    'receiver message receiver message receiver message receiver message receiver message receiver message receiver message receiver message receiver message receiver message receiver message',
-                  ),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(message),
                 ),
               ),
             ),
