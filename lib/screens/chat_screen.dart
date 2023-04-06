@@ -51,14 +51,15 @@ class _ChatScreenState extends State<ChatScreen> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  widget.fullName,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.normal,
-                    color: Colors.black,
+                if (widget.fullName.isNotEmpty)
+                  Text(
+                    widget.fullName,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.normal,
+                      color: Colors.black,
+                    ),
                   ),
-                ),
                 Text(
                   widget.username,
                   style: const TextStyle(
@@ -126,9 +127,17 @@ class _ChatScreenState extends State<ChatScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       if (auth.currentUser!.uid == message['senderId'])
-                        SenderMessageCard(
-                          message: message['text'],
-                          isSeen: message['isSeen'],
+                        GestureDetector(
+                          onLongPress: () async {
+                            await FirestoreService().deleteMessage(
+                              widget.chatId,
+                              message['messageId'],
+                            );
+                          },
+                          child: SenderMessageCard(
+                            message: message['text'],
+                            isSeen: message['isSeen'],
+                          ),
                         ),
                       if (auth.currentUser!.uid == message['receiverId'])
                         ReceiverMessageCard(

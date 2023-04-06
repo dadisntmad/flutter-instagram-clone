@@ -329,4 +329,52 @@ class FirestoreService {
       print(e.toString());
     }
   }
+
+  // delete a conversation
+  Future<void> deleteChat(String chatId) async {
+    try {
+      // delete chat from sender user
+      await db
+          .collection('users')
+          .doc(auth.currentUser!.uid)
+          .collection('chats')
+          .doc(chatId)
+          .delete();
+
+      // delete chat from receiver user
+      await db
+          .collection('users')
+          .doc(chatId)
+          .collection('chats')
+          .doc(auth.currentUser!.uid)
+          .delete();
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  // delete a message
+  Future<void> deleteMessage(String chatId, String messageId) async {
+    try {
+      await db
+          .collection('users')
+          .doc(auth.currentUser!.uid)
+          .collection('chats')
+          .doc(chatId)
+          .collection('messages')
+          .doc(messageId)
+          .delete();
+
+      await db
+          .collection('users')
+          .doc(chatId)
+          .collection('chats')
+          .doc(auth.currentUser!.uid)
+          .collection('messages')
+          .doc(messageId)
+          .delete();
+    } catch (e) {
+      print(e.toString());
+    }
+  }
 }
